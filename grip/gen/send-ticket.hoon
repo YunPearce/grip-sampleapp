@@ -7,9 +7,9 @@
       title='title'
       body='body error text'
       author=*@p
-      anon=|
-      version=*app-version
-            =%support
+      anon=&
+      app-version=*app-version
+      ticket-type=%support
       ==
 :-  %grip
 :-  %create-ticket

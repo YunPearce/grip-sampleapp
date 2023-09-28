@@ -11,7 +11,7 @@
 =|  state-0
 =*  state  -
 %-  %+  agent:grip
-  ~zod               ::dev @p
+  ~pagwyd-ropdeg-nammed-miglev--tabryx-lorlun-lattec-marzod          ::dev @p
   *app-version:grip  ::curent version of the app 
 ::add path for UI
 %-  agent:dbug
@@ -37,11 +37,31 @@
   ?-  -.old
     %0  `this(state old)
   ==
-++  on-poke  on-poke:def
-++  on-agent  on-agent:def
+++  on-poke   
+|=  [=mark =vase]
+^-  (quip card _this)
+  ?+  mark  (on-poke:def mark vase)
+  %noun
+  =/  act  !<(?(%timer) vase)
+  ?-  act
+  %timer  ::`this
+  :_  this
+  :~  [%pass /timer %arvo %b [%wait `@da`(add now.bowl ~s30)]]
+  ==
+  ==
+==
+++  on-agent  
+  |=  [=wire =sign:agent:gall]
+  ^-  (quip card _this)
+  ::`this
+  ?+    wire  (on-agent wire sign)
+  [%timer *]
+  ~|('I forced this crash!' !!)
+  ==
 ++  on-arvo   on-arvo:def
 ++  on-watch  on-watch:def
-++  on-leave  on-leave:def
+++  on-leave  
+!!
 ++  on-peek   on-peek:def
 ++  on-fail   on-fail:def
 --

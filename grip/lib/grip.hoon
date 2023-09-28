@@ -3,7 +3,7 @@
   |=  [=ship =ticket]
   ^-  card:agent:gall
   :*  %pass
-      /
+      /pharos
       %agent
       [ship %pharos]
       %poke
@@ -11,6 +11,18 @@
       !>([%create-ticket ticket])
   ==
 ::
+++  on-fail-ticket
+|=  [dap=@tas our=@p]
+^-  ticket 
+:*
+    board=dap
+    title='on-fail'
+    body='body'
+    author=our
+    anon=|
+    version=*app-version
+    =%report 
+==
 +$  action
   $%
   [%create-ticket =ticket]
@@ -23,6 +35,7 @@
       %report    :: bug report
       %document  :: request for documentation
       %general   :: general feedback
+      ::type for on-fail
   ==
 +$  ticket
   $:  board=term
@@ -119,8 +132,16 @@
     ++  on-agent
       |=  [=wire =sign:agent:gall]
       ^-  (quip card _this)
-      =^  cards  inner  (on-agent:ag wire sign)
-      [cards this]
+    ?+    wire  (on-agent wire sign)
+      [%pharos ~]
+    ?.  ?=(%poke-ack -.sign)
+      (on-agent wire sign)
+    ?~  p.sign
+      %-  (slog '%poke succeeded!' ~)
+      `this
+    %-  (slog 'poke failed!' ~)
+    `this
+    ==
     ::
     ++  on-arvo
       |=  [=wire =sign-arvo]
@@ -131,8 +152,12 @@
     ++  on-fail
       |=  [=term =tang]
       ^-  (quip card _this)
-      =^  cards  inner  (on-fail:ag term tang)
-      [cards this]
+      ::~&  [term tang]
+      ::=^  cards  inner  (on-fail:ag term tang)
+       ~&  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl))
+       :_  this 
+       :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl))
+       ==
     --
   --
 --
