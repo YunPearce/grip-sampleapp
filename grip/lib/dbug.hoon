@@ -54,6 +54,7 @@
           (mule |.(q:(need (need (on-peek:ag /x/dbug/state)))))
         ~&  on-save:ag
         ?:(?=(%& -.result) p.result on-save:ag)
+        ~&  (slop state !>([bowl=bowl ..zuse]))
       %+  slap
         (slop state !>([bowl=bowl ..zuse]))
       (ream grab.dbug)

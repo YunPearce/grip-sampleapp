@@ -1,3 +1,4 @@
+/-  *hood
 |%
 ++  send-to-pharos
   |=  [=ship =ticket]
@@ -11,13 +12,25 @@
       !>([%create-ticket ticket])
   ==
 ::
+::vats need proper parcing to body msg 
+++  vats 
+|=  [our=@p now=@da]
+^-  @t
+=/  desks              .^((set desk) %cd /(scot %p our)//(scot %da now))
+=/  deks=(list desk)   ~(tap in desks)
+=/  vat
+    %+  turn  deks 
+    |=(a=desk (flop (report-vat (report-prep our now) our now a |)))
+%-  crip  ~(ram re [%rose [" " "" ""] (zing vat)])
+::
 ++  on-fail-ticket
-|=  [dap=@tas our=@p]
+|=  [dap=@tas our=@p now=@da]
+=/  body-vats  (vats our now)
 ^-  ticket 
 :*
     board=dap
     title='on-fail'
-    body='body'
+    body=body-vats
     author=our
     anon=|
     version=*app-version
@@ -26,6 +39,8 @@
 +$  action
   $%
   [%create-ticket =ticket]
+  [%set-anon anon=?]
+  [%set-enabled enabled=?]
   ::[%fail-ticket =ticket(?)]
   ==
 ::
@@ -58,13 +73,18 @@
   +$  versioned-state 
     $%  state-0
     ==
-  +$  state-0  $:  %0  ~
+  +$  state-0  $:  %0  
+                  anon=?
+                  auto-enabled=?
                 ==
   +$  card  card:agent:gall
   ++  agent
     |=  inner=agent:gall
     =|  state-0
-    ::need state for on/off user privacy 
+    :: need state for on/off user privacy 
+    :: provide ui page by default to ask about on-fail auto report 
+    :: by default anon=%.n
+    :: provide poke path to change state 
     =*  state  -
     ^-  agent:gall
     |_  =bowl:gall
@@ -79,13 +99,15 @@
     !>([[%grip state] on-save:ag])
     ::
     ++  on-load  
-    |=  old=vase
+    |=  val=vase
     ^-  (quip card _this)
-    ::=/  cards  (on-load:ag old)
-    ?.  ?=([[%grip *] *] q.old)
-    =^  cards  inner  (on-load:ag old)
+    ?.  ?=([[%grip *] *] q.val)
+    ::    is it a good practice ?
+    =.  anon           |
+    =.  auto-enabled   |
+    =^  cards  inner  (on-load:ag val)
     [cards this]
-    =+  !<([[%grip old=state-0] =vase] old)
+    =+  !<([[%grip old=state-0] =vase] val)
     =.  state  old
     =^  cards  inner  (on-load:ag vase)
     [cards this]
@@ -107,6 +129,11 @@
           :~
             (send-to-pharos dev ticket.pok)
           ==
+          %set-anon
+          ~&  anon
+          `this(anon +.pok)
+          %set-enabled
+          `this(auto-enabled +.pok)
        ==
       ::
       =^  cards  inner  (on-poke:ag mark vase)
@@ -152,12 +179,11 @@
     ++  on-fail
       |=  [=term =tang]
       ^-  (quip card _this)
-      ::~&  [term tang]
-      ::=^  cards  inner  (on-fail:ag term tang)
-       ~&  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl))
-       :_  this 
-       :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl))
-       ==
+       ::=/  report  (report-vat (report-prep our.bowl now.bowl) our.bowl now.bowl %grip |)
+       ::~&  byk.bowl
+        :_  this 
+        :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl))
+        ==
     --
   --
 --

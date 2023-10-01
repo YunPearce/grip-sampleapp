@@ -46,7 +46,7 @@
   ?-  act
   %timer  ::`this
   :_  this
-  :~  [%pass /timer %arvo %b [%wait `@da`(add now.bowl ~s30)]]
+  :~  [%pass /timer %arvo %b [%wait `@da`(add now.bowl ~s10)]]
   ==
   ==
 ==
