@@ -24,18 +24,23 @@
 %-  crip  ~(ram re [%rose [" " "" ""] (zing vat)])
 ::
 ++  on-fail-ticket
-|=  [dap=@tas our=@p now=@da]
+|=  [dap=@tas our=@p now=@da anon=?]
 =/  body-vats  (vats our now)
 ^-  ticket 
+=/  =ticket
 :*
     board=dap
     title='on-fail'
     body=body-vats
     author=our
-    anon=|
+    anon=anon
     version=*app-version
     =%report 
 ==
+?:  =(anon &)  ticket 
+=.  author.ticket  ~zod 
+ticket
+::
 +$  action
   $%
   [%create-ticket =ticket]
@@ -74,17 +79,14 @@
     $%  state-0
     ==
   +$  state-0  $:  %0  
-                  anon=?
-                  auto-enabled=?
+                  anon=?           ::by default anon on
+                  auto-enabled=_|  ::by default auto tickets disabled
                 ==
   +$  card  card:agent:gall
   ++  agent
     |=  inner=agent:gall
     =|  state-0
-    :: need state for on/off user privacy 
     :: provide ui page by default to ask about on-fail auto report 
-    :: by default anon=%.n
-    :: provide poke path to change state 
     =*  state  -
     ^-  agent:gall
     |_  =bowl:gall
@@ -103,7 +105,7 @@
     ^-  (quip card _this)
     ?.  ?=([[%grip *] *] q.val)
     ::    is it a good practice ?
-    =.  anon           |
+    =.  anon           &
     =.  auto-enabled   |
     =^  cards  inner  (on-load:ag val)
     [cards this]
@@ -120,11 +122,11 @@
         =/  pok  !<(action vase)
         ?-  -.pok
             %create-ticket 
-            ~&  ticket.pok
+            ::~&  ticket.pok
             =.  board.ticket.pok  dap.bowl
             =.  version.ticket.pok  *app-version
-            ~&   (send-to-pharos dev ticket.pok)
-            =.  author.ticket.pok  ?.(anon.ticket.pok our.bowl ~zod)
+            ::~&   (send-to-pharos dev ticket.pok)
+            =.  author.ticket.pok  ?.(anon our.bowl ~zod)
           :_  this
           :~
             (send-to-pharos dev ticket.pok)
@@ -179,11 +181,16 @@
     ++  on-fail
       |=  [=term =tang]
       ^-  (quip card _this)
+      =/  cards  
+        ?:  =(auto-enabled &)
+          :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
+          ==
+        ~
+      ~&  [auto-enabled cards]
        ::=/  report  (report-vat (report-prep our.bowl now.bowl) our.bowl now.bowl %grip |)
        ::~&  byk.bowl
-        :_  this 
-        :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl))
-        ==
+      [cards this]
+    ::
     --
   --
 --
