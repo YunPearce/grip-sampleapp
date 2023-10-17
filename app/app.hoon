@@ -91,11 +91,15 @@
   ^-  (quip card _this)
   ?+    wire  (on-agent wire sign)
   [%timer *]
-  ~|('I forced this crash!' !!)
+  ::~|('I forced this crash!' !!)
+  ::==
+  `this
   ==
 ++  on-arvo   
   |=  [=wire =sign-arvo]
   ^-  (quip card _this)
+  ?+  wire  (on-arvo:def wire sign-arvo)
+  [%eyre *]
   ?.  ?=([%eyre %bound *] sign-arvo)
     (on-arvo:def [wire sign-arvo])
   ?:  accepted.sign-arvo
@@ -103,10 +107,13 @@
     `this
   %-  (slog leaf+"Binding /apps/app failed!" ~)
  `this
+  [%timer *]
+  ~|('I forced this crash!' !!)
+  ::`this
+   ==
 ::
 ++  on-watch  on-watch:def
-++  on-leave  
-!!
+++  on-leave  on-leave:def
 ++  on-peek   on-peek:def
 ++  on-fail   on-fail:def
 --

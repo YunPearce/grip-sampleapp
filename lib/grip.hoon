@@ -210,11 +210,13 @@
     ++  on-fail
       |=  [=term =tang]
       ^-  (quip card _this)
-      =/  cards  
-        ?:  =(auto-enabled &)
-          :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
-          ==
-          ~
+      ::=/  cards  
+      ~&  ['enabled' auto-enabled]
+      ::?:  =(auto-enabled &) ::CHANGE BACK TO &
+      ~&  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
+      ::   :_  this
+      ::   :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
+      ::   ==
       =^  cards  inner  (on-fail:ag term tang)
       [cards this]
   --
