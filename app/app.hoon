@@ -13,7 +13,7 @@
 =*  state  -
 %-  %-  agent:grip
   :*
-  ~sonteb-bonmul-fortyc-bacmus--sognep-sigdeb-fabhex-marzod          ::dev @p
+  ~togsec-nomtyv-napnul-motsyp--nocnep-silfus-batrux-binzod          ::dev @p
   *app-version:grip                                                  ::curent version of the app 
   /apps/app                                                          ::add path for UI
   ==                                                    

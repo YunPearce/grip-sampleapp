@@ -147,11 +147,10 @@
               =/  jon=(unit json)  (de:json:html q.u.body.request.inbound-request.req)
               ~&  `@t`q.u.body.request.inbound-request.req
               =/  =ticket  (to-ticket (need jon))
-              ~&  ticket
-              ~&  ['to an agent' dap.bowl]
+              =/  url  (crip +:(sa:dejs:format (path:enjs:format (welp :~(~...) +.ui-path))))
               :_  this
               %+  welp
-              %-  send  [200 ~ [%none ~]]
+              %-  send  [302 ~ [%redirect url]]::[200 ~ [%none ~]]
               :~  [%pass /self-poke %agent [our.bowl dap.bowl] %poke %grip !>([%create-ticket ticket])]
               ==
           ==
@@ -215,8 +214,8 @@
         ?:  =(auto-enabled &)
           :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
           ==
-        ~
-      ~&  [auto-enabled cards]
+          ~
+      =^  cards  inner  (on-fail:ag term tang)
       [cards this]
   --
 ::
@@ -273,7 +272,7 @@ ticket
     title=title.val
     body=body.val
     author=~zod
-    anon=?~(anon.val & |)
+    anon=?~(anon.val | &)
     app-version=*app-version
     ticket-type=tt
 ==
@@ -321,7 +320,7 @@ ticket
     ;h1: Support ticket form
     ;div.form
     ;form
-    =hx-post    path
+    ::=hx-post    path
     :: =hx-target  "#content"
     :: =hx-select  "#content"
         ;label.check(for "anon"): Want to remain anonymous?
@@ -340,7 +339,7 @@ ticket
         ;input(type "text", name "title");
         ;label(for "body"): Additional details
         ;textarea(type "text", name "body");
-        ;button: submit
+        ;button(hx-post path, hx-target "body", hx-push-url "true"): submit
       ==
     ==
     ::==
