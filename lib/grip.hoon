@@ -5,7 +5,6 @@
 +$  action
   $%
   [%create-ticket =ticket]
-  [%set-anon anon=?]
   [%set-enabled enabled=?]
   ::[%fail-ticket =ticket(?)]
   ==
@@ -16,7 +15,6 @@
       %report    :: bug report
       %document  :: request for documentation
       %general   :: general feedback
-      ::type for on-fail
   ==
 +$  ticket
   $:  =desk
@@ -26,7 +24,6 @@
       anon=?
       =app-version
       =ticket-type
-      ::contact-further
       ==
 +$  app-version
   [major=@ud minor=@ud patch=@ud]
@@ -36,18 +33,13 @@
   ^-  $-(agent:gall agent:gall)
   |^  agent
   ::
-  +$  versioned-state 
-    $%  state-0
-    ==
   +$  state-0  $:  %0  
-                  anon=?           ::by default anon on
-                  auto-enabled=_|  ::by default auto tickets disabled
+                  auto-enabled=?
                 ==
   +$  card  card:agent:gall
   ++  agent
     |=  inner=agent:gall
     =|  state-0
-    :: provide ui page by default to ask about on-fail auto report 
     =*  state  -
     ^-  agent:gall
     |_  =bowl:gall
@@ -56,8 +48,11 @@
     ::
     ++  on-init
       ^-  (quip card _this)
+      =.  auto-enabled  %.n
+      ~&  ['auto' auto-enabled]
       =^  cards  inner  on-init:ag
       [cards this]
+    ::
     ++  on-save  
     !>([[%grip state] on-save:ag])
     ::
@@ -65,11 +60,11 @@
     |=  val=vase
     ^-  (quip card _this)
     ?.  ?=([[%grip *] *] q.val)
-    ::    is it a good practice ?
-    =.  anon           &
-    =.  auto-enabled   |
-    =^  cards  inner  (on-load:ag val)
-    [cards this]
+      =.  auto-enabled  %.n
+      ~&  ['auto' auto-enabled]
+      =^  cards  inner  (on-load:ag val)
+      [cards this]
+      ::
     =+  !<([[%grip old=state-0] =vase] val)
     =.  state  old
     =^  cards  inner  (on-load:ag vase)
@@ -79,10 +74,8 @@
       |=  [=mark =vase]
       ^-  (quip card _this)
       |^
-      ~&  [mark 'mark from grip']
       ?+  mark  [inner-cards this]
       %grip
-        ~&  'in %grip mark'
         ?>  =(src.bowl our.bowl)
         =/  pok  !<(action vase)
         ?-  -.pok
@@ -91,18 +84,14 @@
             =.  app-version.ticket.pok  *app-version
             =.  author.ticket.pok   ?.(anon.ticket.pok our.bowl ~zod)
             ~&  ticket.pok
-            ::=.  author.ticket.pok   ?.(anon our.bowl ~zod)
             ~&  dev
           :_  this
           :~  (send-to-pharos dev ticket.pok)
           ==
-          %set-anon
-          `this(anon +.pok)
           ::
           %set-enabled
           `this(auto-enabled +.pok)
         ==
-      
       %handle-http-request
       ?>  =(src.bowl our.bowl)
       =/  req  !<([eyre-id=@ta =inbound-request:eyre] vase)
@@ -110,27 +99,31 @@
       =/  ,request-line:server  (parse-request-line:server url.request.inbound-request.req)
       =+  send=(cury response:schooner eyre-id.req)
       =*  dump   [inner-cards this]
-      ::
-      =^  cards  state
-        ^-  (quip card _state)
-        dump
+      :: =^  cards  state
+        :: ^-  (quip card _state)
+        :: dump
         ?+    method.request.inbound-request.req  dump
           ::
             %'GET'
-            ~&  site
-            ?.  =(ui-path (snip site))  dump
+            ~&  `(list @ta)`(swag [0 2] site)
+            ?.  =(ui-path `(list @ta)`(swag [0 2] site))  dump
               ::  fallback: forward poke to wrapped agent core
-            =/  site=(list @t)  (oust [0 2] site)  :: now we know this isn't ~
-            =/  url=tape  (sa:dejs:format (path:enjs:format (welp ui-path [~.new-ticket ~])))
-            ~&  ['url' url]
-            ?:  =(~ site)  dump
-              ::  fall back if the path ends here
-            ?+  site  dump
-            ::check if url == "{ui-path}"
+            =/  new-site=(list @t)  (oust [0 2] site)  :: now we know this isn't ~
+            =/  url=tape  (to-tape-url (welp ui-path [~.new-ticket ~]))
+            =/  sett-url  (to-tape-url (welp site /settings))
+            ?:  =(~ new-site)  dump
+            ?+  new-site  dump
             [%report ~]
             :_  this
             %-  send 
-            [200 ~ [%manx (home url)]]
+            [200 ~ [%manx (home url sett-url)]]
+            ::
+            [%report %settings ~]
+            ~&  ['auto' =(auto-enabled %.n)]
+            :_  this
+            %-  send 
+            ::[200 ~ [%manx (home-setting "./settings-update" auto-enabled)]]
+            [200 ~ [%manx (home-setting "./settings-update" =(auto-enabled %.y))]]
             ==
            %'POST'
             ?.  =(ui-path (snip site))  dump
@@ -147,15 +140,31 @@
               =/  jon=(unit json)  (de:json:html q.u.body.request.inbound-request.req)
               ~&  `@t`q.u.body.request.inbound-request.req
               =/  =ticket  (to-ticket (need jon))
-              =/  url  (crip +:(sa:dejs:format (path:enjs:format (welp :~(~...) +.ui-path))))
+              =/  url  (crip +:(to-tape-url (welp :~(~...) +.ui-path)))
               :_  this
               %+  welp
-              %-  send  [302 ~ [%redirect url]]::[200 ~ [%none ~]]
+              %-  send  [302 ~ [%redirect url]]
               :~  [%pass /self-poke %agent [our.bowl dap.bowl] %poke %grip !>([%create-ticket ticket])]
               ==
+            [%settings-update ~]
+            ~&  'setting-update'
+              ?~  body.request.inbound-request.req
+                :_  this
+                %-  send  [405 ~ [%stock ~]]
+              =/  =json  (need (de:json:html q.u.body.request.inbound-request.req))
+              =.  auto-enabled  ?:  =((auto:dejs json) 'true')  &  |
+              ~&  ['updated' auto-enabled]
+              ~&  ['json' (auto:dejs json)]
+              :_  this
+              %-  send  [302 ~ [%redirect '../app/report']]
           ==
         ==
       ==
+      ++  to-tape-url
+      |=  site=path
+      ^-  tape
+      (sa:dejs:format (path:enjs:format site))
+      ::
       ++  inner-cards
       =^  cards  inner  (on-poke:ag mark vase)
       cards
@@ -211,9 +220,9 @@
       |=  [=term =tang]
       ^-  (quip card _this)
       ::=/  cards  
-      ~&  ['enabled' auto-enabled]
+      ::~&  ['enabled' auto-enabled]
       ::?:  =(auto-enabled &) ::CHANGE BACK TO &
-      ~&  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
+      ~&  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl))
       ::   :_  this
       ::   :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
       ::   ==
@@ -246,29 +255,29 @@
 %-  crip  ~(ram re [%rose [" " "" ""] (zing vat)])
 ::
 ++  on-fail-ticket
-|=  [dap=@tas our=@p now=@da anon=?]
+|=  [dap=@tas our=@p now=@da]
 =/  body-vats  (vats our now)
 ^-  ticket 
-=/  =ticket
+::=/  =ticket
 :*
     desk=dap
     title='on-fail'
     body=body-vats
     author=our
-    anon=anon
+    anon=|
     app-version=*app-version
     =%report 
 ==
-?:  =(anon &)  ticket 
-=.  author.ticket  ~zod 
-ticket
+
+:: ?:  =(anon &)  ticket 
+:: =.  author.ticket  ~zod 
+:: ticket
 ::
 ++  to-ticket 
 |=  =json
 ^-  ticket 
-=/  val=[title=@t body=@t tt=@t anon=@t]  (dejs json)
+=/  val=[title=@t body=@t tt=@t anon=@t]  (json-ticket:dejs json)
 =/  tt  (tt-check tt.val)
-~&  tt
 :*  
     desk=*@tas
     title=title.val
@@ -279,19 +288,25 @@ ticket
     ticket-type=tt
 ==
 ::
- ++  tt-check 
- |=  i=@t
- %-  ticket-type  i
- ::
+  ++  tt-check 
+  |=  i=@t
+  %-  ticket-type  i
+  ::
   ++  dejs
   =,  dejs:format 
-  ::^-  [title=@t body=@t tt=@t anon=@t]
+  |%  
+  ++  json-ticket
   %-  ou
   :~  [%title (un so)]
       [%body (un so)]
       [%ticket-type (un so)]
       [%anon (uf '' so)]
   ==
+  ++  auto
+  %-  ou
+  :~  [%auto (un so)]
+  ==
+  --
 ::
 ++  page
   |=  kid=manx
@@ -316,15 +331,14 @@ ticket
   ==
 ::
 ++  home
-|=  path=tape
+|=  [path=tape sett-path=tape]
   %-  page
+  ;div.page
+  ;button.set-btn(hx-get sett-path, hx-swap "outerHTML"): Settings
   ;div.main
     ;h1: Support ticket form
     ;div.form
     ;form
-    ::=hx-post    path
-    :: =hx-target  "#content"
-    :: =hx-select  "#content"
         ;label.check(for "anon"): Want to remain anonymous?
         ;input(type "checkbox", name "anon", value "true", defaultvalue "false");
         ;h3: By remaining anonymous your @p wont be shared with developer.
@@ -344,7 +358,24 @@ ticket
         ;button(hx-post path, hx-target "body", hx-push-url "true"): submit
       ==
     ==
-    ::==
+  ==
+  ==
+++  home-setting
+|=  [path=tape auto=?]
+  %-  page
+  ;div.page
+        ;form.settings
+        ;button.set: X
+        ;h2: This app supports automatic crush report
+        ;+  ?:  auto
+         ;input(type "hidden", name "auto", value "false");
+        ;input(type "hidden", name "auto", value "true");
+        ;button.set(hx-post path, hx-target "body", hx-push-url "true")
+            ;+  ?:  auto
+              ;/  "disable" 
+            ;/  "enable"
+        ==
+    ==
   ==
 ::
 ++  style
@@ -352,15 +383,48 @@ ticket
   %-  trip
   '''
   :root {
-    --measure: 70ch;
+  --measure: 70ch;
+  font-family: Lora, serif;
+  }
+  .page{
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+  color: #197489;
+  font-family: Lora, serif;
   }
   .main {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 3px solid black;
+  border: 5px solid #78c6ce;
   padding: 10px;
+  background-color: #78c6ce;
+  }
+  .settings{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 5px solid #197489;
+  padding: 10px;
+  z-index:3;
+  background-color: #197489;
+  color: white;
+  }
+  .set{
+  background: #78c6ce;
+  border: 2px solid #78c6ce;
+  width:auto;
+  margin: auto;
+  padding:10px;
+  float:right;
+  }
+  .set:hover{
+  background: #197489;
+  border: #78c6ce;
+  color: white;
   }
   h1{
   text-align:center;
@@ -377,7 +441,7 @@ ticket
   width: 100%;
   padding: 12px;
   margin: 3px;
-  border: 1px solid black;
+  border: none;
   resize: vertical;
   }
   label {
@@ -395,7 +459,6 @@ ticket
   display: inline-block;
   }
   input[type=submit] {
-  background-color: #04AA6D;
   color: white;
   padding: 12px 20px;
   border: none;
@@ -410,12 +473,21 @@ ticket
   width: 100%;
   margin:3px;
   display: inline-block;
-  background: white;
-  border: 1px solid black;
+  background: #197489;
+  border: 2px solid #197489;
+  color: white;
   }
   button:hover{
-  background: black;
+  background: #197489;
+  border: #197489;
   color: white;
+  }
+  .set-btn{
+  border: 2px solid #197489;
+  width:auto;
+  margin: auto;
+  padding:10px;
+  float:right;
   }
   '''
 --

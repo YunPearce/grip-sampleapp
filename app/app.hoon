@@ -47,7 +47,6 @@
 |=  [=mark =vase]
 ^-  (quip card _this)
 |^
-  ~&  mark
   ?+  mark  (on-poke:def mark vase)
   %noun
   =/  act  !<(?(%timer) vase)
@@ -108,8 +107,8 @@
   %-  (slog leaf+"Binding /apps/app failed!" ~)
  `this
   [%timer *]
-  ~|('I forced this crash!' !!)
-  ::`this
+  ::~|('I forced this crash!' !!)
+  `this
    ==
 ::
 ++  on-watch  on-watch:def
