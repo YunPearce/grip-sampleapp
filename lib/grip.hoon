@@ -214,14 +214,37 @@
     ++  on-fail
       |=  [=term =tang]
       ^-  (quip card _this)
-      ::=/  cards  
-      ::~&  ['enabled' auto-enabled]
+      |^
       ?:  =(auto-enabled &) 
         :_  this
-        :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
+        :~  (send-to-pharos dev on-fail-ticket)
         ==
       =^  cards  inner  (on-fail:ag term tang)
       [cards this]
+      ::
+      ++  on-fail-ticket
+        =/  body-vats  vats
+        ^-  ticket 
+        :*
+            desk=dap.bowl
+            title='on-fail'
+            body=body-vats
+            author=our.bowl
+            anon=|
+            app-version=*app-version
+            =%report 
+        ==
+        ::
+      ::vats need proper parcing to body msg 
+      ++  vats 
+        ^-  @t
+        =/  desks              .^((set desk) %cd /(scot %p our.bowl)//(scot %da now.bowl))
+        =/  deks=(list desk)   ~(tap in desks)
+        =/  vat
+            %+  turn  deks 
+            |=(a=desk (flop (report-vat (report-prep our.bowl now.bowl) our.bowl now.bowl a |)))
+        %-  crip  ~(ram re [%rose [" " "" ""] (zing vat)])
+    --
   --
 ::
 ++  send-to-pharos
@@ -236,31 +259,6 @@
       %pharos-action
       !>([%create-ticket ticket])
   ==
-::
-::vats need proper parcing to body msg 
-++  vats 
-|=  [our=@p now=@da]
-^-  @t
-=/  desks              .^((set desk) %cd /(scot %p our)//(scot %da now))
-=/  deks=(list desk)   ~(tap in desks)
-=/  vat
-    %+  turn  deks 
-    |=(a=desk (flop (report-vat (report-prep our now) our now a |)))
-%-  crip  ~(ram re [%rose [" " "" ""] (zing vat)])
-::
-++  on-fail-ticket
-|=  [dap=@tas our=@p now=@da]
-=/  body-vats  (vats our now)
-^-  ticket 
-:*
-    desk=dap
-    title='on-fail'
-    body=body-vats
-    author=our
-    anon=|
-    app-version=*app-version
-    =%report 
-==
 ::
 ++  to-ticket 
 |=  =json

@@ -85,15 +85,6 @@
     ::==
   ==
   --
-++  on-agent  
-  |=  [=wire =sign:agent:gall]
-  ^-  (quip card _this)
-  ?+    wire  (on-agent wire sign)
-  [%timer *]
-  ::~|('I forced this crash!' !!)
-  ::==
-  `this
-  ==
 ++  on-arvo   
   |=  [=wire =sign-arvo]
   ^-  (quip card _this)
@@ -107,10 +98,10 @@
   %-  (slog leaf+"Binding /apps/app failed!" ~)
  `this
   [%timer *]
-  ::~|('I forced this crash!' !!)
-  `this
+  ~|('I forced this crash!' !!)
    ==
 ::
+++  on-agent  on-agent:def
 ++  on-watch  on-watch:def
 ++  on-leave  on-leave:def
 ++  on-peek   on-peek:def
@@ -119,7 +110,6 @@
 ::
 |_  bowl=bowl:gall
 ::
-::++  dev  ~zod
 ++  make-200
   |=  [eyre-id=@ta dat=octs]
   ^-  (list card)
@@ -137,5 +127,4 @@
       [%give %fact ~[/http-response/[eyre-id]] %http-response-data !>(dat)]
       [%give %kick ~[/http-response/[eyre-id]] ~]
   ==
-
 --
