@@ -94,7 +94,6 @@
       %handle-http-request
       ?>  =(src.bowl our.bowl)
       =/  req  !<([eyre-id=@ta =inbound-request:eyre] vase)
-      ::=/  site  site:(parse-request-line:server url.request.inbound-request.req)
       =/  ,request-line:server  (parse-request-line:server url.request.inbound-request.req)
       =+  send=(cury response:schooner eyre-id.req)
       =*  dump   [inner-cards this]
@@ -124,7 +123,7 @@
            %'POST'
             ?.  =(ui-path (snip site))  dump   ::  fallback: forward poke to wrapped agent core
             =/  back-url=tape  +:(to-tape-url (welp :~(~...) +.ui-path))
-            =.  site  (oust [0 2] site)        :: now we know this isn't ~
+            =.  site  (oust [0 2] site)        ::  now we know this isn't ~
             ?~  site  dump                     ::  fall back if the path ends here
             ?+  site  dump
             ::
@@ -133,7 +132,6 @@
                 :_  this
                 %-  send  [405 ~ [%stock ~]]
               =/  jon=(unit json)  (de:json:html q.u.body.request.inbound-request.req)
-              ~&  `@t`q.u.body.request.inbound-request.req
               =/  =ticket  (to-ticket (need jon))
               :_  this
               %+  welp
@@ -147,8 +145,6 @@
                 %-  send  [405 ~ [%stock ~]]
               =/  =json  (need (de:json:html q.u.body.request.inbound-request.req))
               =.  auto-enabled  ?:  =((auto:dejs json) 'true')  &  |
-              ~&  ['updated' auto-enabled]
-              ~&  ['json' (auto:dejs json)]
               =/  url  (crip (weld back-url "/report"))
               :_  this
               %-  send  [302 ~ [%redirect url]]
@@ -166,42 +162,36 @@
       --
     ::
     ++  on-watch
-      |=  =path
-      ^-  (quip card _this)
-      ::=^  cards  inner  (on-watch:ag path)
-      ::[cards this]
-      `this
+    |=  =path
+    ^-  (quip card _this)
+    `this
     ::
     ++  on-leave
-      |=  =path
-      ^-  (quip card _this)
-      =^  cards  inner  (on-leave:ag path)
-      [cards this]
+    |=  =path
+    ^-  (quip card _this)
+    =^  cards  inner  (on-leave:ag path)
+    [cards this]
     ::
     ++  on-peek
-      |=  =path
-      ^-  (unit (unit cage))
-      (on-peek:ag path)
+    |=  =path
+    ^-  (unit (unit cage))
+    (on-peek:ag path)
     ::
     ++  on-agent
-      |=  [=wire =sign:agent:gall]
-      ^-  (quip card _this)
+    |=  [=wire =sign:agent:gall]
+    ^-  (quip card _this)
     ?+    wire  (on-agent wire sign)
       [%pharos ~]
     ?.  ?=(%poke-ack -.sign)
       (on-agent wire sign)
     ?~  p.sign
-      %-  (slog '%poke succeeded!' ~)
       `this
-    %-  (slog 'poke failed!' ~)
     `this
       [%self-poke ~]
     ?.  ?=(%poke-ack -.sign)
       (on-agent wire sign)
     ?~  p.sign
-      %-  (slog '%self-poke succeeded!' ~)
       `this
-    %-  (slog '%self-poke failed!' ~)
     `this
     ==
     ::
@@ -212,15 +202,15 @@
     [cards this]
     ::
     ++  on-fail
-      |=  [=term =tang]
-      ^-  (quip card _this)
-      |^
-      ?:  =(auto-enabled &) 
-        :_  this
-        :~  (send-to-pharos dev on-fail-ticket)
-        ==
-      =^  cards  inner  (on-fail:ag term tang)
-      [cards this]
+    |=  [=term =tang]
+    ^-  (quip card _this)
+    |^
+    ?:  =(auto-enabled &) 
+      :_  this
+      :~  (send-to-pharos dev on-fail-ticket)
+      ==
+    =^  cards  inner  (on-fail:ag term tang)
+    [cards this]
       ::
       ++  on-fail-ticket
         =/  body-vats  vats
@@ -234,7 +224,6 @@
             app-version=*app-version
             =%report 
         ==
-        ::
       ::vats need proper parcing to body msg 
       ++  vats 
         ^-  @t
@@ -310,6 +299,11 @@
         =crossorigin  "anonymous"
         =integrity    "sha384-nRnAvEUI7N/XvvowiMiq7oEI04gOXMCqD3Bidvedw+YNbj7zTQACPlRI3Jt3vYM4"
         =src          "https://unpkg.com/htmx.org@1.9.0/dist/ext/json-enc.js";
+      ;link
+        =rel          "stylesheet"
+        =crossorigin  "anonymous"
+        =integrity    "sha384-Kh+o8x578oGal2nue9zyjl2GP9iGiZ535uZ3CxB3mZf3DcIjovs4J1joi2p+uK18"
+        =href         "https://unpkg.com/@fontsource/lora@5.0.8/index.css";
       ;style: {style}
     ==
     ;body(hx-ext "json-enc,include-vals")
@@ -326,7 +320,7 @@
     ;h1: Support ticket form
     ;div.form
     ;form
-        ;label.check(for "anon"): Want to remain anonymous?
+        ;label.check(for "anon"): Remain anonymous?
         ;input(type "checkbox", name "anon", value "true", defaultvalue "false");
         ;h3: By remaining anonymous your @p wont be shared with developer.
         ;h3: By adding your @p developer may be able to provide you more detailed support.
@@ -339,10 +333,10 @@
           ;option(value "general"):  Leave feedback
           ==
         ;label(for "title"): Describe the problem
-        ;input(type "text", name "title");
+        ;input(type "text", name "title", required "");
         ;label(for "body"): Additional details
-        ;textarea(type "text", name "body");
-        ;button(hx-post path, hx-target "body", hx-push-url "true"): submit
+        ;textarea(type "text", name "body", required "");
+        ;button.submit(hx-post path, hx-target "body", hx-push-url "true"): submit
       ==
     ==
   ==
@@ -352,7 +346,7 @@
   %-  page
   ;div.page
         ;form.settings
-        ;button.set: X
+        ;button.exit: X
         ;h2: This app supports automatic crush report
         ;+  ?:  auto
          ;input(type "hidden", name "auto", value "false");
@@ -371,110 +365,125 @@
   '''
   :root {
   --measure: 70ch;
-  font-family: Lora, serif;
   }
   .page{
-  margin: auto;
-  width: 50%;
-  padding: 10px;
-  color: #197489;
+  margin:      auto;
+  width:       50%;
+  padding:     10px;
+  color:       white;
   font-family: Lora, serif;
   }
   .main {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 5px solid #78c6ce;
-  padding: 10px;
-  background-color: #78c6ce;
+  position:         absolute;
+  top:              50%;
+  left:             50%;
+  transform:        translate(-50%, -50%);
+  border:           5px solid #197489;
+  padding:          10px;
+  background-color: #197489;
   }
   .settings{
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  position:  absolute;
+  top:       50%;
+  left:      50%;
   transform: translate(-50%, -50%);
-  border: 5px solid #197489;
-  padding: 10px;
-  z-index:3;
+  border:    10px solid #197489;
+  padding:   10px;
+  z-index:   3;
   background-color: #197489;
-  color: white;
-  }
-  .set{
-  background: #78c6ce;
-  border: 2px solid #78c6ce;
-  width:auto;
-  margin: auto;
-  padding:10px;
-  float:right;
-  }
-  .set:hover{
-  background: #197489;
-  border: #78c6ce;
-  color: white;
+  color:            white;
+  text-align:       center;
   }
   h1{
-  text-align:center;
-  width: 100%;
-  margin: auto;
+  font-family: Lora, serif;
+  text-align:  center;
+  width:       100%;
+  margin:      auto;
+  font-size:   24px;
+  font-weight: bold;
+  }
+  h2{
+  font-size:   16px;
   }
   h3{
-  color: #727272;
-  font-size: 11px;
-  width: 100%;
-  margin: auto;
-  }
-  input[type=text], textarea, select{
-  width: 100%;
-  padding: 12px;
-  margin: 3px;
-  border: none;
-  resize: vertical;
+  color:       #78c6ce;
+  font-size:   11px;
+  width:       100%;
+  margin:      auto;
   }
   label {
-  width: 100%;
-  margin:3px;
-  display: inline-block;
+  width:     100%;
+  margin:    3px;
+  font-size: 16px;
+  display:   inline-block;
+  }
+  input[type=text], textarea, select{
+  width:       100%;
+  padding:     12px;
+  margin:      3px;
+  border:      none;
+  resize:      vertical;
+  font-family: Lora, serif;
   }
   input[type=checkbox]{
-  height: 20px;
-  width: 20px;
+  border:       none;
+  height:       20px;
+  width:        20px;
+  accent-color: #78C6CE;
   }
   .check{
-  width: 50%;
-  margin:3px;
+  width:   50%;
+  margin:  3px;
   display: inline-block;
   }
-  input[type=submit] {
-  color: white;
+  input[type=submit]{
+  color:   white;
   padding: 12px 20px;
-  border: none;
-  cursor: pointer;
-  float: right;
+  border:  none;
+  cursor:  pointer;
+  float:   right;
   }
   textarea{
   resize: none;
   height: 150px;
   }
   button{
-  width: 100%;
-  margin:3px;
-  display: inline-block;
-  background: #197489;
-  border: 2px solid #197489;
-  color: white;
+  display: block;
+  margin:  auto;
+  width:   auto;
+  padding: 10px;
+  border:  2px solid white;
+  background:  white;
+  color:       #197489;
+  font-family: Lora, serif;
   }
   button:hover{
-  background: #197489;
-  border: #197489;
-  color: white;
+  background:       #C9E8EF;
+  border: 2px solid #C9E8EF;
+  }
+  .submit{
+  margin-top: 10px;
   }
   .set-btn{
-  border: 2px solid #197489;
-  width:auto;
-  margin: auto;
-  padding:10px;
-  float:right;
+  color:   white;
+  background:        #197489;
+  border:  2px solid #197489;
+  margin:  auto;
+  padding: 10px;
+  float:   right;
+  }
+  .set-btn:hover{
+  background:       #92B7C5;
+  border: 2px solid #92B7C5;
+  }
+  .exit{
+  width:         auto;
+  margin:        auto;
+  margin-left:   6px;
+  margin-bottom: 6px;
+  padding:       5px;
+  float:         right;
+  font-size:     10px;
   }
   '''
 --
