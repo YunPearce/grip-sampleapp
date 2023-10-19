@@ -6,7 +6,6 @@
   $%
   [%create-ticket =ticket]
   [%set-enabled enabled=?]
-  ::[%fail-ticket =ticket(?)]
   ==
 ::
 +$  ticket-type 
@@ -16,6 +15,7 @@
       %document  :: request for documentation
       %general   :: general feedback
   ==
+  ::
 +$  ticket
   $:  =desk
       title=@t
@@ -25,6 +25,7 @@
       =app-version
       =ticket-type
       ==
+  ::
 +$  app-version
   [major=@ud minor=@ud patch=@ud]
   ::
@@ -49,7 +50,6 @@
     ++  on-init
       ^-  (quip card _this)
       =.  auto-enabled  %.n
-      ~&  ['auto' auto-enabled]
       =^  cards  inner  on-init:ag
       [cards this]
     ::
@@ -61,7 +61,6 @@
     ^-  (quip card _this)
     ?.  ?=([[%grip *] *] q.val)
       =.  auto-enabled  %.n
-      ~&  ['auto' auto-enabled]
       =^  cards  inner  (on-load:ag val)
       [cards this]
       ::
@@ -99,20 +98,17 @@
       =/  ,request-line:server  (parse-request-line:server url.request.inbound-request.req)
       =+  send=(cury response:schooner eyre-id.req)
       =*  dump   [inner-cards this]
-      :: =^  cards  state
-        :: ^-  (quip card _state)
-        :: dump
         ?+    method.request.inbound-request.req  dump
           ::
             %'GET'
-            ~&  `(list @ta)`(swag [0 2] site)
             ?.  =(ui-path `(list @ta)`(swag [0 2] site))  dump
               ::  fallback: forward poke to wrapped agent core
-            =/  new-site=(list @t)  (oust [0 2] site)  :: now we know this isn't ~
-            =/  url=tape  (to-tape-url (welp ui-path [~.new-ticket ~]))
+            =/  url       (to-tape-url (welp ui-path /new-ticket))
             =/  sett-url  (to-tape-url (welp site /settings))
-            ?:  =(~ new-site)  dump
-            ?+  new-site  dump
+            =.  site      (oust [0 2] site)  :: now we know this isn't ~
+            ?~  site  dump
+            ?+  site  dump
+            ::
             [%report ~]
             :_  this
             %-  send 
@@ -122,15 +118,14 @@
             ~&  ['auto' =(auto-enabled %.n)]
             :_  this
             %-  send 
-            ::[200 ~ [%manx (home-setting "./settings-update" auto-enabled)]]
-            [200 ~ [%manx (home-setting "./settings-update" =(auto-enabled %.y))]]
+            [200 ~ [%manx (home-setting =(auto-enabled %.y))]]
             ==
+          ::
            %'POST'
-            ?.  =(ui-path (snip site))  dump
-              ::  fallback: forward poke to wrapped agent core
-            =/  site=(list @t)  (oust [0 2] site)  :: now we know this isn't ~
-            ?:  =(~ site)  dump
-              ::  fall back if the path ends here
+            ?.  =(ui-path (snip site))  dump   ::  fallback: forward poke to wrapped agent core
+            =/  back-url=tape  +:(to-tape-url (welp :~(~...) +.ui-path))
+            =.  site  (oust [0 2] site)        :: now we know this isn't ~
+            ?~  site  dump                     ::  fall back if the path ends here
             ?+  site  dump
             ::
             [%new-ticket ~]
@@ -140,14 +135,13 @@
               =/  jon=(unit json)  (de:json:html q.u.body.request.inbound-request.req)
               ~&  `@t`q.u.body.request.inbound-request.req
               =/  =ticket  (to-ticket (need jon))
-              =/  url  (crip +:(to-tape-url (welp :~(~...) +.ui-path)))
               :_  this
               %+  welp
-              %-  send  [302 ~ [%redirect url]]
+              %-  send  [302 ~ [%redirect (crip back-url)]]
               :~  [%pass /self-poke %agent [our.bowl dap.bowl] %poke %grip !>([%create-ticket ticket])]
               ==
+            ::
             [%settings-update ~]
-            ~&  'setting-update'
               ?~  body.request.inbound-request.req
                 :_  this
                 %-  send  [405 ~ [%stock ~]]
@@ -155,8 +149,9 @@
               =.  auto-enabled  ?:  =((auto:dejs json) 'true')  &  |
               ~&  ['updated' auto-enabled]
               ~&  ['json' (auto:dejs json)]
+              =/  url  (crip (weld back-url "/report"))
               :_  this
-              %-  send  [302 ~ [%redirect '../app/report']]
+              %-  send  [302 ~ [%redirect url]]
           ==
         ==
       ==
@@ -221,11 +216,10 @@
       ^-  (quip card _this)
       ::=/  cards  
       ::~&  ['enabled' auto-enabled]
-      ::?:  =(auto-enabled &) ::CHANGE BACK TO &
-      ~&  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl))
-      ::   :_  this
-      ::   :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
-      ::   ==
+      ?:  =(auto-enabled &) 
+        :_  this
+        :~  (send-to-pharos dev (on-fail-ticket dap.bowl our.bowl now.bowl anon))
+        ==
       =^  cards  inner  (on-fail:ag term tang)
       [cards this]
   --
@@ -258,7 +252,6 @@
 |=  [dap=@tas our=@p now=@da]
 =/  body-vats  (vats our now)
 ^-  ticket 
-::=/  =ticket
 :*
     desk=dap
     title='on-fail'
@@ -268,10 +261,6 @@
     app-version=*app-version
     =%report 
 ==
-
-:: ?:  =(anon &)  ticket 
-:: =.  author.ticket  ~zod 
-:: ticket
 ::
 ++  to-ticket 
 |=  =json
@@ -361,7 +350,7 @@
   ==
   ==
 ++  home-setting
-|=  [path=tape auto=?]
+|=  auto=?
   %-  page
   ;div.page
         ;form.settings
@@ -370,7 +359,7 @@
         ;+  ?:  auto
          ;input(type "hidden", name "auto", value "false");
         ;input(type "hidden", name "auto", value "true");
-        ;button.set(hx-post path, hx-target "body", hx-push-url "true")
+        ;button.set(hx-post "./settings-update", hx-target "body", hx-push-url "true")
             ;+  ?:  auto
               ;/  "disable" 
             ;/  "enable"
