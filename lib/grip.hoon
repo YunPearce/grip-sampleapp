@@ -1,6 +1,4 @@
 /-  *hood
-::get rid of schooner and serever lib 
-/+  schooner, server
 |%
 +$  action
   $%
@@ -94,8 +92,8 @@
       %handle-http-request
       ?>  =(src.bowl our.bowl)
       =/  req  !<([eyre-id=@ta =inbound-request:eyre] vase)
-      =/  ,request-line:server  (parse-request-line:server url.request.inbound-request.req)
-      =+  send=(cury response:schooner eyre-id.req)
+      =/  site  (parse-request-line url.request.inbound-request.req)
+      =+  send=(cury simple-payload eyre-id.req)
       =*  dump   [inner-cards this]
         ?+    method.request.inbound-request.req  dump
           ::
@@ -110,14 +108,14 @@
             ::
             [%report ~]
             :_  this
-            %-  send 
-            [200 ~ [%manx (home url sett-url)]]
+            %-  manx-payload
+            [eyre-id.req 200 ~ (home url sett-url)]
             ::
             [%report %settings ~]
             ~&  ['auto' =(auto-enabled %.n)]
             :_  this
-            %-  send 
-            [200 ~ [%manx (home-setting =(auto-enabled %.y))]]
+            %-  manx-payload
+            [eyre-id.req [200 ~ (home-setting =(auto-enabled %.y))]]
             ==
           ::
            %'POST'
@@ -130,7 +128,7 @@
             [%new-ticket ~]
               ?~  body.request.inbound-request.req
                 :_  this
-                %-  send  [405 ~ [%stock ~]]
+                %-  send  [405 ~ [%err ~]]
               =/  jon=(unit json)  (de:json:html q.u.body.request.inbound-request.req)
               =/  =ticket  (to-ticket (need jon))
               :_  this
@@ -142,7 +140,7 @@
             [%settings-update ~]
               ?~  body.request.inbound-request.req
                 :_  this
-                %-  send  [405 ~ [%stock ~]]
+                %-  send  [405 ~ [%err ~]]
               =/  =json  (need (de:json:html q.u.body.request.inbound-request.req))
               =.  auto-enabled  ?:  =((auto:dejs json) 'true')  &  |
               =/  url  (crip (weld back-url "/report"))
@@ -205,15 +203,19 @@
     |=  [=term =tang]
     ^-  (quip card _this)
     |^
+    ~&  ~(ram re [%rose [" " "" ""] tang])
+    =/  trace  ~(ram re [%rose ["\\n" "" "--"] tang])
     ?:  =(auto-enabled &) 
       :_  this
-      :~  (send-to-pharos dev on-fail-ticket)
+      :~  (send-to-pharos dev (on-fail-ticket trace))
       ==
     =^  cards  inner  (on-fail:ag term tang)
     [cards this]
       ::
       ++  on-fail-ticket
-        =/  body-vats  vats
+      |=  trace=tape
+        =/  body-vats   %-  crip  
+                        %+  weld  trace  vats
         ^-  ticket 
         :*
             desk=dap.bowl
@@ -226,13 +228,13 @@
         ==
       ::vats need proper parcing to body msg 
       ++  vats 
-        ^-  @t
+        ^-  tape
         =/  desks              .^((set desk) %cd /(scot %p our.bowl)//(scot %da now.bowl))
         =/  deks=(list desk)   ~(tap in desks)
         =/  vat
             %+  turn  deks 
             |=(a=desk (flop (report-vat (report-prep our.bowl now.bowl) our.bowl now.bowl a |)))
-        %-  crip  ~(ram re [%rose [" " "" ""] (zing vat)])
+        ~(ram re [%rose ["\\n" "" ""] (zing vat)])
     --
   --
 ::
@@ -284,6 +286,52 @@
   ==
   --
 ::
+::  server
+::
++$  header  [key=@t value=@t]
++$  headers  (list header)
+::
+++  parse-request-line
+  |=  url=@t
+  ^-  (list @t)
+  =/  req-line=[[ext=(unit @ta) site=(list @t)] args=(list [@t @t])]  
+  %+  fall  (rush url ;~(plug apat:de-purl:html yque:de-purl:html)) 
+  [[~ ~] ~]
+  site.req-line
+::
+++  manx-payload
+|=  [eyre-id=@ta http-status=@ud =headers =manx]
+%-  give-simple-payload 
+:*  eyre-id 
+  :-  http-status
+      ['content-type'^'text/html']~ 
+`(as-octt:mimes:html (en-xml:html manx))
+==
+::
+++  simple-payload
+|=  [eyre-id=@ta http-status=@ud =headers resource=[type=@tas data=@]]
+=/  type  (?(%redirect %err) type.resource)
+%-  give-simple-payload 
+:-  eyre-id
+?-  type
+%redirect 
+  :_  ~
+  :-  http-status
+  (weld headers ['location'^data.resource]~)
+%err
+  :_  (some (as-octs:mimes:html '<h1>405 Method Not Allowed</h1>'))
+  :-  http-status
+  (weld headers ['content-type'^'text/html']~)
+==
+::
+++  give-simple-payload
+  |=  [eyre-id=@ta hed=response-header:http dat=(unit octs)]
+  ^-  (list card)
+  :~  [%give %fact ~[/http-response/[eyre-id]] %http-response-header !>(hed)]
+      [%give %fact ~[/http-response/[eyre-id]] %http-response-data !>(dat)]
+      [%give %kick ~[/http-response/[eyre-id]] ~]
+  ==
+::
 ++  page
   |=  kid=manx
   ^-  manx
@@ -304,6 +352,7 @@
         =crossorigin  "anonymous"
         =integrity    "sha384-Kh+o8x578oGal2nue9zyjl2GP9iGiZ535uZ3CxB3mZf3DcIjovs4J1joi2p+uK18"
         =href         "https://unpkg.com/@fontsource/lora@5.0.8/index.css";
+        ;script:  htmx.logAll();
       ;style: {style}
     ==
     ;body(hx-ext "json-enc,include-vals")
@@ -335,8 +384,8 @@
         ;label(for "title"): Describe the problem
         ;input(type "text", name "title", required "");
         ;label(for "body"): Additional details
-        ;textarea(type "text", name "body", required "");
-        ;button.submit(hx-post path, hx-target "body", hx-push-url "true"): submit
+        ;textarea(type "text", name "body", required "", minlength "3");
+        ;button.submit(type "submit", hx-post path, hx-target "body", hx-push-url "true"): submit
       ==
     ==
   ==
