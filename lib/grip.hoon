@@ -77,11 +77,9 @@
         =/  pok  !<(action vase)
         ?-  -.pok
           %create-ticket 
-            =.  desk.ticket.pok    dap.bowl
+            =.  desk.ticket.pok         dap.bowl
             =.  app-version.ticket.pok  *app-version
-            =.  author.ticket.pok   ?.(anon.ticket.pok our.bowl ~zod)
-            ~&  ticket.pok
-            ~&  dev
+            =.  author.ticket.pok       ?.(anon.ticket.pok our.bowl ~zod)
           :_  this
           :~  (send-to-pharos dev ticket.pok)
           ==
@@ -112,17 +110,16 @@
             [eyre-id.req 200 ~ (home url sett-url)]
             ::
             [%report %settings ~]
-            ~&  ['auto' =(auto-enabled %.n)]
             :_  this
             %-  manx-payload
             [eyre-id.req [200 ~ (home-setting =(auto-enabled %.y))]]
             ==
           ::
            %'POST'
-            ?.  =(ui-path (snip site))  dump   ::  fallback: forward poke to wrapped agent core
+            ?.  =(ui-path (snip site))  dump
             =/  back-url=tape  +:(to-tape-url (welp :~(~...) +.ui-path))
-            =.  site  (oust [0 2] site)        ::  now we know this isn't ~
-            ?~  site  dump                     ::  fall back if the path ends here
+            =.  site  (oust [0 2] site)
+            ?~  site  dump                     
             ?+  site  dump
             ::
             [%new-ticket ~]
@@ -203,7 +200,6 @@
     |=  [=term =tang]
     ^-  (quip card _this)
     |^
-    ~&  ~(ram re [%rose [" " "" ""] tang])
     =/  trace  ~(ram re [%rose ["\\n" "" "--"] tang])
     ?:  =(auto-enabled &) 
       :_  this
@@ -241,7 +237,6 @@
 ++  send-to-pharos
   |=  [=ship =ticket]
   ^-  card:agent:gall
-  ~&  [%create-ticket ticket]
   :*  %pass
       /pharos
       %agent
@@ -364,13 +359,13 @@
 |=  [path=tape sett-path=tape]
   %-  page
   ;div.page
-  ;button.set-btn(hx-get sett-path, hx-swap "outerHTML"): Settings
+  ;button.set(hx-get sett-path, hx-swap "outerHTML"): Settings
   ;div.main
     ;h1: Support ticket form
     ;div.form
     ;form
         ;label.check(for "anon"): Remain anonymous?
-        ;input(type "checkbox", name "anon", value "true", defaultvalue "false");
+          ;input(type "checkbox", name "anon", value "true", defaultvalue "false");
         ;h3: By remaining anonymous your @p wont be shared with developer.
         ;h3: By adding your @p developer may be able to provide you more detailed support.
         ;label(for "ticket-type"): How can we help you?
@@ -382,9 +377,9 @@
           ;option(value "general"):  Leave feedback
           ==
         ;label(for "title"): Describe the problem
-        ;input(type "text", name "title", required "");
+          ;input(type "text", name "title", required "");
         ;label(for "body"): Additional details
-        ;textarea(type "text", name "body", required "", minlength "3");
+          ;textarea(type "text", name "body", required "", minlength "3");
         ;button.submit(type "submit", hx-post path, hx-target "body", hx-push-url "true"): submit
       ==
     ==
@@ -398,8 +393,8 @@
         ;button.exit: X
         ;h2: This app supports automatic crush report
         ;+  ?:  auto
-         ;input(type "hidden", name "auto", value "false");
-        ;input(type "hidden", name "auto", value "true");
+          ;input(type "hidden", name "auto", value "false");
+          ;input(type "hidden", name "auto", value "true");
         ;button.set(hx-post "./settings-update", hx-target "body", hx-push-url "true")
             ;+  ?:  auto
               ;/  "disable" 
@@ -416,121 +411,121 @@
   --measure: 70ch;
   }
   .page{
-  margin:      auto;
-  width:       50%;
-  padding:     10px;
-  color:       white;
-  font-family: Lora, serif;
+  margin:           auto;
+  width:            50%;
+  padding:          10px;
+  color:            black;
+  font-family:      Lora, serif;
   }
   .main {
   position:         absolute;
   top:              50%;
   left:             50%;
   transform:        translate(-50%, -50%);
-  border:           5px solid #197489;
+  border:           8px solid #197489;
   padding:          10px;
-  background-color: #197489;
+  padding-top:      2px;
+  background-color: white;
   }
   .settings{
-  position:  absolute;
-  top:       50%;
-  left:      50%;
-  transform: translate(-50%, -50%);
-  border:    10px solid #197489;
-  padding:   10px;
-  z-index:   3;
-  background-color: #197489;
-  color:            white;
+  position:         absolute;
+  top:              50%;
+  left:             50%;
+  transform:        translate(-50%, -50%);
+  border:           10px solid #78c6ce;
+  padding:          10px;
+  z-index:          3;
+  background-color: white;
+  color:            black;
   text-align:       center;
   }
   h1{
-  font-family: Lora, serif;
-  text-align:  center;
-  width:       100%;
-  margin:      auto;
-  font-size:   24px;
-  font-weight: bold;
+  font-size:        24px;
+  font-weight:      bold;
+  font-family:      Lora, serif;
+  color:            white;
+  text-align:       center;
+  width:            100%;
+  padding:          auto;
+  padding-bottom:   10px;
+  padding-top:      10px;
+  margin-top:       0;
+  margin-bottom:    5px;
+  display:          block;
+  background:       #2AAFCE;
   }
   h2{
-  font-size:   16px;
+  font-size:        16px;
   }
   h3{
-  color:       #78c6ce;
-  font-size:   11px;
-  width:       100%;
-  margin:      auto;
+  color:            #2AAFCE;
+  font-size:        11px;
+  width:            100%;
+  margin:           auto;
   }
   label {
-  width:     100%;
-  margin:    3px;
-  font-size: 16px;
-  display:   inline-block;
+  width:            100%;
+  margin:           3px;
+  font-size:        16px;
+  display:          inline-block;
   }
   input[type=text], textarea, select{
-  width:       100%;
-  padding:     12px;
-  margin:      3px;
-  border:      none;
-  resize:      vertical;
-  font-family: Lora, serif;
+  width:            100%;
+  padding:          12px;
+  margin:           3px;
+  border:           3px solid #197489;
+  resize:           vertical;
+  font-family:      monospace;
   }
   input[type=checkbox]{
-  border:       none;
-  height:       20px;
-  width:        20px;
-  accent-color: #78C6CE;
+  height:           20px;
+  float:            right;
+  width:            20px;
+  accent-color:     #2AAFCE;
   }
   .check{
-  width:   50%;
-  margin:  3px;
-  display: inline-block;
-  }
-  input[type=submit]{
-  color:   white;
-  padding: 12px 20px;
-  border:  none;
-  cursor:  pointer;
-  float:   right;
+  width:            50%;
+  margin:           3px;
+  display:          inline-block;
   }
   textarea{
-  resize: none;
-  height: 150px;
+  resize:           none;
+  height:           150px;
+  }
+  input:focus [type=checkbox], textarea, select, [type=text]{
+  outline:          none;
   }
   button{
-  display: block;
-  margin:  auto;
-  width:   auto;
-  padding: 10px;
-  border:  2px solid white;
-  background:  white;
-  color:       #197489;
-  font-family: Lora, serif;
+  font-family:      monospace;
+  font-size:        90%;
+  display:          block;
+  margin:           auto;
+  width:            auto;
+  padding:          5px;
+  border:           2px solid #197489;
+  border-radius:    6px;
+  background:       #368C96;
+  color:            white;
   }
   button:hover{
-  background:       #C9E8EF;
-  border: 2px solid #C9E8EF;
+  cursor:           pointer;
   }
   .submit{
-  margin-top: 10px;
+  float:            right;
+  margin-top:       10px;
   }
-  .set-btn{
-  color:   white;
-  background:        #197489;
-  border:  2px solid #197489;
-  margin:  auto;
-  padding: 10px;
-  float:   right;
-  }
-  .set-btn:hover{
-  background:       #92B7C5;
-  border: 2px solid #92B7C5;
+  .set{
+  float: right;
   }
   .exit{
   width:         auto;
   margin:        auto;
+  button-radius: 1px;
   margin-left:   6px;
   margin-bottom: 6px;
   padding:       5px;
+  padding-right: 8px;
+  padding-left:  8px;
   float:         right;
   font-size:     10px;
   }
