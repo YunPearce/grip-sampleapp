@@ -130,7 +130,7 @@
               =/  =ticket  (to-ticket (need jon))
               :_  this
               %+  welp
-              %-  send  [302 ~ [%redirect (crip back-url)]]
+              %-  send  [302 [%'HX-Refresh' 'true']~ [%redirect (crip back-url)]]
               :~  [%pass /self-poke %agent [our.bowl dap.bowl] %poke %grip !>([%create-ticket ticket])]
               ==
             ::
@@ -180,9 +180,7 @@
     ?.  ?=(%poke-ack -.sign)
       (on-agent wire sign)
     ?~  p.sign
-    ~&  'poke succeed'
       `this
-    ~&  'poke fail'
     ~&  ~(ram re [%rose ["  " "" ""] (need p.sign)])
     `this
       [%self-poke ~]
@@ -240,7 +238,7 @@
 ++  send-to-pharos
   |=  [=ship =ticket]
   ^-  card:agent:gall
-  ~&  ticket
+  ::~&  ticket
   :*  %pass
       /pharos
       %agent
@@ -287,7 +285,7 @@
 ::
 ::  server
 ::
-+$  header  [key=@t value=@t]
++$  header   [key=@t value=@t]
 +$  headers  (list header)
 ::
 ++  parse-request-line
@@ -384,7 +382,7 @@
           ;input(type "text", name "title", required "");
         ;label(for "body"): Additional details
           ;textarea(type "text", name "body", required "", minlength "3");
-        ;button.submit(type "submit", hx-post path, hx-target "body", hx-push-url "true"): submit
+        ;button.submit(type "submit", hx-post path, hx-target "body", hx-push-url "true", hx-swap "outerHTML", hx-push-url "true"): submit
       ==
     ==
   ==

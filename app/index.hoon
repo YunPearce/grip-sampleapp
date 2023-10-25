@@ -12,14 +12,14 @@
     ;meta(charset "utf-8");
     ;style: {style}
     ==
-  ;body
-    ;div.main
+  ;body.bdy
+    ;div.body-main
     ;div.header
       ;h1: Your amazing app
     ==
-    ;h3: about app text
-    ;div.btn
-    ;a/"./app/report": HELP
+    ;h3: Ultimately, what makes an app truly awesome its ability to enhance and simplify users lives and provide solutions to their problems. Click the button bellow to help us help you!
+    ;div.butn
+    ;a/"./app/report": HELP?
     ==
     ==
   ==
@@ -31,10 +31,10 @@
   :root {
   --measure: 70ch;
   }
-  body{
+  .bdy{
   background:  black;
   }
-  .main{
+  .body-main{
   possition:        absolute;
   border:           2px solid black;
   margin:           auto;
@@ -51,7 +51,7 @@
   padding:    10px;
   border-radius:10px;
   }
-  .btn{
+  .butn{
   display: flex; 
   justify-content: flex-end; 
   }
