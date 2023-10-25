@@ -222,7 +222,7 @@
             app-version=*app-version
             =%report 
         ==
-      ::vats need proper parcing to body msg 
+      ::
       ++  vats 
         ^-  tape
         =/  desks              .^((set desk) %cd /(scot %p our.bowl)//(scot %da now.bowl))
