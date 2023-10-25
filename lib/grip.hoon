@@ -15,7 +15,7 @@
   ==
   ::
 +$  ticket
-  $:  =desk
+  $:  board=desk
       title=@t
       body=@t
       author=@p
@@ -77,7 +77,7 @@
         =/  pok  !<(action vase)
         ?-  -.pok
           %create-ticket 
-            =.  desk.ticket.pok         dap.bowl
+            =.  board.ticket.pok         dap.bowl
             =.  app-version.ticket.pok  *app-version
             =.  author.ticket.pok       ?.(anon.ticket.pok our.bowl ~zod)
           :_  this
@@ -180,7 +180,10 @@
     ?.  ?=(%poke-ack -.sign)
       (on-agent wire sign)
     ?~  p.sign
+    ~&  'poke succeed'
       `this
+    ~&  'poke fail'
+    ~&  ~(ram re [%rose ["  " "" ""] (need p.sign)])
     `this
       [%self-poke ~]
     ?.  ?=(%poke-ack -.sign)
@@ -222,7 +225,7 @@
             app-version=*app-version
             =%report 
         ==
-      ::
+      ::vats need proper parcing to body msg 
       ++  vats 
         ^-  tape
         =/  desks              .^((set desk) %cd /(scot %p our.bowl)//(scot %da now.bowl))
@@ -237,13 +240,14 @@
 ++  send-to-pharos
   |=  [=ship =ticket]
   ^-  card:agent:gall
+  ~&  ticket
   :*  %pass
       /pharos
       %agent
       [ship %pharos]
       %poke
       %pharos-action
-      !>([%create-ticket ticket])
+      !>([%create-ticket :*(board.ticket title.ticket body.ticket author.ticket anon.ticket app-version.ticket `ticket-type`ticket-type.ticket)])
   ==
 ::
 ++  to-ticket 

@@ -9,7 +9,7 @@
       author=*@p
       anon=&
       app-version=*app-version
-      ticket-type=%support
+      ticket-type=%general
       ==
 :-  %grip
 :-  %create-ticket
