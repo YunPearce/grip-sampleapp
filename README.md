@@ -19,7 +19,7 @@
 
 2. %grip includes a page for feedback submission. This makes it easy for a developer to integrate a page for collecting user feedback.
 
-In your agent application, configure the necessary UI elements to direct the end user to the page for form submission. An example would be a button or a-tag. This is the front-end element that redirects users to the %grip submission form fronted that will be hosted at `<path>/report`.
+-In your agent application, configure the necessary UI elements to direct the end user to the page for form submission. An example would be a button or a-tag. This is the front-end element that redirects users to the %grip submission form fronted that will be hosted at `<path>/report`.
 
 3. **Form submission**: Once configured, users have the capability to provide feedback directly in the %grip form. The following fields are available:
 
@@ -33,14 +33,25 @@ In your agent application, configure the necessary UI elements to direct the end
 
 ## Testing %grip & On-Fail Logic
 
-Testing %grip is possible using the included sample application. To install,
+Testing %grip is possible using the included sample application. This sample app can be configured to communicate to an installed %pharos agent for testing. To install,
 
 ```hoon
 |new-desk %grip
 |mount %grip
 ```
 
-Then copy the contents of the app to your ship's %grip desk. Then
+Then copy the contents of the app to your ship's %grip desk. 
+
+Next you will need to modify the @p of the parent ship/star where the %pharos app is installed. In the sample, this is contained on line 16 of the `app.hoon` file. For example, if you are running %pharos on a fakezod named ~zod:
+
+```hoon
+%-  %-  agent:grip
+  :*
+  **~zod           :: @p of a ship/star etc. where you'll have your %pharos app installed**
+  *app-version   :: curent version of the app
+  /apps/app      :: path where your app located or rather where you would set up your button, this path will be used to host %grip page/form and on submiting form user will be rerdirected back to current path
+  ==
+```
 
 ```hoon
 |commit %grip
