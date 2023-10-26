@@ -46,6 +46,8 @@ Next you will need to modify the @p of the parent ship/star where the %pharos ap
 
 ```hoon
 ...
+%-  %-  agent:grip
+  :*
   ~zod           :: @p of a ship/star etc. where you'll have your %pharos app installed
 ...
 ```
