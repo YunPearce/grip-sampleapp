@@ -51,6 +51,7 @@ Next you will need to modify the @p of the parent ship/star where the %pharos ap
   ~zod           :: @p of a ship/star etc. where you'll have your %pharos app installed
 ...
 ```
+Save `app.hoon`, then commit and install:
 
 ```hoon
 |commit %grip
