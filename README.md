@@ -45,12 +45,9 @@ Then copy the contents of the app to your ship's %grip desk.
 Next you will need to modify the @p of the parent ship/star where the %pharos app is installed. In the sample, this is contained on line 16 of the `app.hoon` file. For example, if you are running %pharos on a fakezod named ~zod:
 
 ```hoon
-%-  %-  agent:grip
-  :*
-  **~zod           :: @p of a ship/star etc. where you'll have your %pharos app installed**
-  *app-version   :: curent version of the app
-  /apps/app      :: path where your app located or rather where you would set up your button, this path will be used to host %grip page/form and on submiting form user will be rerdirected back to current path
-  ==
+...
+  ~zod           :: @p of a ship/star etc. where you'll have your %pharos app installed
+...
 ```
 
 ```hoon
