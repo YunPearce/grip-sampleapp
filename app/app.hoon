@@ -13,11 +13,11 @@
 =*  state  -
 %-  %-  agent:grip
   :*
-  ~dantul-samdeb-nocdys-wictyn--borsul-datfet-palrut-wanzod          ::dev @p
-  *app-version:grip                                                  ::curent version of the app 
-  /apps/app                                                          ::add path for UI
-  ==                                                    
-%-  agent:dbug
+  ~zod                    ::dev @p
+  *app-version:grip       ::curent version of the app 
+  /apps/app               ::add path for UI
+  ==                  
+%-  agent:dbug                                  
 ^-  agent:gall
 =<
     |_  =bowl:gall
